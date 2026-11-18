@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Política de Privacidade — NFC Lab · 4u-Labs</title>
+  <link rel="icon" type="image/png" href="favicon.png?v=1.0">
+  <style>
+    body { margin:0; font-family: system-ui, -apple-system, sans-serif; background:#0b0f15; color:#e5e7eb; line-height:1.65; }
+    main { max-width:800px; margin:0 auto; padding:40px 24px; }
+    header { display:flex; align-items:center; justify-content:space-between; gap:12px; border-bottom:1px solid #1e293b; padding-bottom:20px; margin-bottom:28px; }
+    .brand { display:flex; align-items:center; gap:12px; text-decoration:none; color:#fff; font-weight:700; }
+    .brand img { width:38px; height:38px; border-radius:10px; }
+    h1 { color:#00f5e1; font-size:26px; margin-top:0; }
+    h2 { color:#fff; font-size:18px; margin-top:24px; }
+    a { color:#00f5e1; }
+    .card { background:#131926; border:1px solid #1e293b; border-radius:14px; padding:24px; margin-bottom:20px; }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <a class="brand" href="index.html">
+        <img src="icon-192.png?v=1.0" alt="NFC Lab">
+        <span>NFC Lab · 4u-Labs</span>
+      </a>
+      <a href="index.html">← Voltar ao App / Back to App</a>
+    </header>
+
+    <h1>Política de Privacidade / Privacy Policy</h1>
+
+    <div class="card">
+      <h2>1. Arquitetura 100% Client-Side (Zero Servidor)</h2>
+      <p>O <strong>NFC Lab</strong> foi construído seguindo o princípio de segurança e privacidade máxima: todo o processamento de leitura, decodificação NDEF, montagem de payloads e gravação em chips NFC ocorre <strong>exclusivamente na memória local do seu navegador</strong> através da API nativa Web NFC do Google Chrome.</p>
+      <p><em>English:</em> <strong>NFC Lab</strong> operates 100% on the client side. All tag scanning, NDEF parsing, payload assembly, and hardware writes happen strictly within your local browser memory via the native Web NFC API.</p>
+    </div>
+
+    <div class="card">
+      <h2>2. Armazenamento Local e Histórico de Leituras</h2>
+      <p>Históricos de leitura, presets de gravação ou tags salvas são mantidos unicamente no seu dispositivo via <code>localStorage</code>. Nenhum dado de chip, UID, senha ou contato é enviado para servidores externos ou compartilhado com terceiros.</p>
+      <p><em>English:</em> Reading history, templates, and saved tag profiles reside solely on your device via <code>localStorage</code>. No chip data, UID, passwords, or contacts are ever transmitted to external servers.</p>
+    </div>
+
+    <div class="card">
+      <h2>3. Permissões de Hardware (Web NFC)</h2>
+      <p>O aplicativo solicita acesso ao recurso NFC do dispositivo apenas no momento em que você decide escanear ou gravar uma tag. Essa permissão é gerenciada pelo próprio sistema operacional Android e pode ser revogada a qualquer instante nas configurações do navegador.</p>
+      <p><em>English:</em> Hardware NFC permissions are requested only when you actively trigger a scan or write operation. You can revoke this permission anytime in your browser settings.</p>
+    </div>
+  </main>
+</body>
+</html>

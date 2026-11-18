@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Guia de Uso Completo — NFC Lab · 4u-Labs</title>
+  <link rel="icon" type="image/png" href="favicon.png?v=1.2">
+  <style>
+    body { margin:0; font-family: system-ui, -apple-system, sans-serif; background:#0b0f15; color:#e5e7eb; line-height:1.65; }
+    main { max-width:800px; margin:0 auto; padding:40px 24px; }
+    header { display:flex; align-items:center; justify-content:space-between; gap:12px; border-bottom:1px solid #1e293b; padding-bottom:20px; margin-bottom:28px; }
+    .brand { display:flex; align-items:center; gap:12px; text-decoration:none; color:#fff; font-weight:700; }
+    .brand img { width:38px; height:38px; border-radius:10px; }
+    h1 { color:#00f5e1; font-size:26px; margin-top:0; }
+    h2 { color:#fff; font-size:18px; margin-top:24px; }
+    a { color:#00f5e1; text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    .card { background:#131926; border:1px solid #1e293b; border-radius:14px; padding:24px; margin-bottom:20px; }
+    .step-num { display:inline-block; width:26px; height:26px; border-radius:50%; background:#00f5e1; color:#0b0f15; text-align:center; line-height:26px; font-weight:700; margin-right:8px; }
+    code { background: rgba(0,245,225,0.1); color: #00f5e1; padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+    .feature-list { list-style:none; padding-left:0; margin:14px 0 0; }
+    .feature-list li { padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.06); display:flex; align-items:flex-start; gap:10px; }
+    .feature-list li:last-child { border-bottom:none; }
+    .feature-icon { font-size:18px; line-height:1.4; flex-shrink:0; }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <a class="brand" href="index.html">
+        <img src="icon-192.png?v=1.2" alt="NFC Lab">
+        <span>NFC Lab · 4u-Labs</span>
+      </a>
+      <a href="index.html">← Voltar ao App / Back to App</a>
+    </header>
+
+    <h1>Guia de Uso Completo — NFC Lab</h1>
+
+    <div class="card">
+      <h2>Requisitos para Gravação e Leitura no Navegador</h2>
+      <p>O <strong>NFC Lab</strong> utiliza a especificação moderna <code>Web NFC</code> da W3C. Para ler e gravar tags físicas:</p>
+      <ul>
+        <li><strong>Navegador recomendado:</strong> Google Chrome ou Edge no <strong>Android</strong>.</li>
+        <li><strong>Hardware:</strong> Celular com sensor NFC ativo (ative em <em>Configurações → Conexões → NFC</em>).</li>
+        <li><strong>No iPhone (iOS):</strong> A Apple restringe a API Web NFC no navegador Safari. Usuários de iPhone conseguem <strong>ler e abrir</strong> tags gravadas normalmente pelo leitor nativo do iOS, mas para gravar pelo celular é necessário um aparelho Android com Chrome ou o app nativo.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2><span class="step-num">✨</span> Cartões Virtuais & Tags: Dados 100% Clicáveis e Interativos</h2>
+      <p>Ao gravar cartões digitais ou perfis com o <strong>NFC Lab</strong> (incluindo o atalho para o <em>Cartão Executivo 3D</em> do app parceiro <a href="https://4u.ia.br/app/vcard/" target="_blank">vCard</a> ou perfis de contato), todos os dados exibidos para quem aproxima o celular são <strong>totalmente interativos e clicáveis</strong> sem exigir instalação de aplicativo:</p>
+      <ul class="feature-list">
+        <li>
+          <span class="feature-icon">📞</span>
+          <div><strong>Telefone Principal & WhatsApp:</strong> Um toque no número inicia a ligação de voz imediatamente ou abre a conversa direta com sua empresa no WhatsApp com mensagem de boas-vindas pronta.</div>
+        </li>
+        <li>
+          <span class="feature-icon">✉️</span>
+          <div><strong>E-mail Executivo:</strong> Um toque abre o cliente de e-mail padrão do celular (Gmail, Apple Mail, Outlook) já com o destinatário e o assunto comercial preenchidos.</div>
+        </li>
+        <li>
+          <span class="feature-icon">🌐</span>
+          <div><strong>Website & Redes Sociais:</strong> Redireciona com um clique para seu website oficial, portfólio, loja virtual ou perfil do Instagram/LinkedIn.</div>
+        </li>
+        <li>
+          <span class="feature-icon">📍</span>
+          <div><strong>Endereço Comercial com Abertura Direta no Google Maps:</strong> Ao tocar no endereço impresso no verso do cartão ou no ícone de localização (📍), o <strong>Google Maps</strong> (ou app nativo de GPS) é aberto automaticamente com a rota traçada até a porta da sua empresa, clínica ou escritório! Se você configurou o link oficial do Google Meu Negócio, ele abre a página verificada com fotos, horários e avaliações.</div>
+        </li>
+        <li>
+          <span class="feature-icon">💾</span>
+          <div><strong>Salvar Contato na Agenda:</strong> Botão instantâneo para baixar o arquivo <code>.vcf</code> ou salvar o contato completo na agenda telefônica do cliente de forma 100% offline.</div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2><span class="step-num">1</span> Como Ler e Inspecionar Tags</h2>
+      <p>Acesse a aba <strong>🔍 Ler</strong>, toque em <em>"Ativar Leitor NFC"</em> e encoste o cartão plástico ou adesivo NFC na traseira do celular (geralmente perto da câmera). O app extrairá o <strong>UID (número de série)</strong>, modelo do chip (ex: NTAG213 / 215 / 216), tamanho em bytes e decodificará todos os registros gravados.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="step-num">2</span> Como Gravar Dados no Chip</h2>
+      <p>Acesse a aba <strong>✍️ Gravar</strong>, escolha o tipo de dado (URL, Contato vCard, Wi-Fi, Texto, Telefone, SMS, E-mail, GPS ou App) e preencha as informações. Observe o medidor de bytes em tempo real. Toque em <em>"Gravar no Chip NFC Agora"</em> e encoste o cartão no celular até ouvir o sinal sonoro.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="step-num">3</span> Clonar, Formatar e Gerenciar</h2>
+      <p>Na aba <strong>⚙️ Outros</strong>, você pode duplicar o último chip lido para novas tags com o <em>"Clonar Tag"</em>, limpar a memória com <em>"Formatar / Apagar"</em> ou bloquear permanentemente contra alterações indesejadas com o <em>"Travar Read-Only"</em>.</p>
+    </div>
+  </main>
+</body>
+</html>

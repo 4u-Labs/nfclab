@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Termos de Uso — NFC Lab · 4u-Labs</title>
+  <link rel="icon" type="image/png" href="favicon.png?v=1.0">
+  <style>
+    body { margin:0; font-family: system-ui, -apple-system, sans-serif; background:#0b0f15; color:#e5e7eb; line-height:1.65; }
+    main { max-width:800px; margin:0 auto; padding:40px 24px; }
+    header { display:flex; align-items:center; justify-content:space-between; gap:12px; border-bottom:1px solid #1e293b; padding-bottom:20px; margin-bottom:28px; }
+    .brand { display:flex; align-items:center; gap:12px; text-decoration:none; color:#fff; font-weight:700; }
+    .brand img { width:38px; height:38px; border-radius:10px; }
+    h1 { color:#00f5e1; font-size:26px; margin-top:0; }
+    h2 { color:#fff; font-size:18px; margin-top:24px; }
+    a { color:#00f5e1; }
+    .card { background:#131926; border:1px solid #1e293b; border-radius:14px; padding:24px; margin-bottom:20px; }
+    .alert-danger { background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); padding: 14px; border-radius: 10px; color: #fca5a5; }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <a class="brand" href="index.html">
+        <img src="icon-192.png?v=1.0" alt="NFC Lab">
+        <span>NFC Lab · 4u-Labs</span>
+      </a>
+      <a href="index.html">← Voltar ao App / Back to App</a>
+    </header>
+
+    <h1>Termos de Uso / Terms of Service</h1>
+
+    <div class="card">
+      <h2>1. Finalidade do Aplicativo</h2>
+      <p>O <strong>NFC Lab</strong> é uma suíte de ferramentas web de código aberto desenvolvida pela <strong>4u-Labs</strong> para fins de diagnóstico, prototipagem, automação e gravação de chips e tags NFC compatíveis com o padrão NFC Forum NDEF.</p>
+      <p><em>English:</em> <strong>NFC Lab</strong> is an open-source web utility suite developed by <strong>4u-Labs</strong> for diagnostic, prototyping, automation, and NDEF recording on standard NFC Forum tags.</p>
+    </div>
+
+    <div class="card">
+      <h2>2. Aviso Crítico sobre Bloqueio de Chips (Read-Only Lock)</h2>
+      <div class="alert-danger">
+        ⚠️ <strong>ATENÇÃO:</strong> A funcionalidade de travar ou bloquear um chip NFC como "Somente Leitura" (Read-Only) queima os bits de trava física (Lock Bytes) do hardware (como nos chips NXP NTAG213, NTAG215 e NTAG216). <strong>Essa operação é irreversível e permanente por especificação do chip.</strong> O NFC Lab não se responsabiliza por cartões travados acidentalmente pelo usuário.
+      </div>
+      <p><em>English:</em> Locking an NFC tag to Read-Only permanently burns hardware lock bytes according to NXP specifications. This operation cannot be reversed.</p>
+    </div>
+
+    <div class="card">
+      <h2>3. Licença e Isenção de Garantias</h2>
+      <p>O software é disponibilizado gratuitamente "como está" (as-is), sem garantias expressas ou implícitas. O usuário é o único responsável pela compatibilidade do seu smartphone e das tags físicas utilizadas.</p>
+    </div>
+  </main>
+</body>
+</html>

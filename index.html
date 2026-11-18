@@ -1,0 +1,721 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#0b0f15">
+  <meta name="description" content="NFC Lab — Suíte completa Web NFC para ler, diagnosticar chip UID, gravar múltiplos registros NDEF, clonar, formatar e criar tarefas NFC diretamente no navegador.">
+  <title>NFC Lab — Suíte Web de Ferramentas NFC · 4u-Labs</title>
+
+  <link rel="icon" type="image/png" href="favicon.png?v=1.2">
+  <link rel="apple-touch-icon" href="icon-192.png?v=1.2">
+  <link rel="manifest" href="manifest.json?v=1.2">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=1.2">
+</head>
+<body>
+  <!-- Header Bar -->
+  <header class="app-header">
+    <div class="brand">
+      <img src="icon-192.png?v=1.2" alt="NFC Lab" class="brand-logo" width="34" height="34">
+      <div class="brand-text">
+        <div class="brand-title">
+          <strong>NFC Lab</strong>
+          <span class="brand-badge">WEB SUITE</span>
+        </div>
+        <small class="brand-sub" data-i18n="brandSub">DIAGNÓSTICO & GRAVAÇÃO NFC · 4u-Labs</small>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <div class="lang-switch" role="group" aria-label="Idioma / Language">
+        <button type="button" class="lang-btn active" data-lang="pt">PT</button>
+        <span>|</span>
+        <button type="button" class="lang-btn" data-lang="en">EN</button>
+      </div>
+
+      <button type="button" class="btn-action btn-icon-only" id="btn-open-help" title="Guia / Ajuda">
+        ?
+      </button>
+
+      <button type="button" class="btn-action hide-sm" id="btn-open-community" title="Ecossistema 4u-Labs">
+        4u-Labs ↗
+      </button>
+
+      <button type="button" class="btn-pwa-install" id="btn-pwa-install" title="Instalar Aplicativo (PWA)">
+        <span class="pwa-icon">📲</span> <span class="pwa-label" data-i18n="installApp">Instalar</span>
+      </button>
+
+      <div class="nfc-hardware-badge" id="nfc-hardware-status">
+        <span class="status-dot"></span>
+        <span class="status-text" data-i18n="nfcReady">Web NFC Ativo</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="app-main">
+    <!-- Top Navigation Tabs (NFC Tools Inspired) -->
+    <nav class="lab-tabs" role="tablist">
+      <button type="button" class="tab-btn active" data-tab="read" role="tab" aria-selected="true">
+        <span class="tab-icon">🔍</span>
+        <span class="tab-label" data-i18n="tabRead">Ler & Inspecionar</span>
+      </button>
+      <button type="button" class="tab-btn" data-tab="write" role="tab" aria-selected="false">
+        <span class="tab-icon">✍️</span>
+        <span class="tab-label" data-i18n="tabWrite">Gravar NDEF</span>
+      </button>
+      <button type="button" class="tab-btn" data-tab="tools" role="tab" aria-selected="false">
+        <span class="tab-icon">⚙️</span>
+        <span class="tab-label" data-i18n="tabTools">Ferramentas & Clone</span>
+      </button>
+      <button type="button" class="tab-btn" data-tab="tasks" role="tab" aria-selected="false">
+        <span class="tab-icon">⚡</span>
+        <span class="tab-label" data-i18n="tabTasks">Atalhos Rápidos</span>
+      </button>
+    </nav>
+
+    <!-- TAB 1: READ & INSPECT (LER) -->
+    <section class="tab-pane active" id="pane-read">
+      <div class="hero-action-card">
+        <div class="hero-radar-preview" id="read-radar" hidden>
+          <div class="radar-rings">
+            <span></span><span></span><span></span>
+            <div class="radar-core">📡</div>
+          </div>
+          <p class="radar-text" data-i18n="radarHoldRead">Aproxime o cartão ou tag NFC da traseira do celular…</p>
+          <button type="button" class="btn-small danger" id="btn-cancel-read" data-i18n="btnCancel">Cancelar Leitura</button>
+        </div>
+
+        <div class="hero-initial" id="read-initial">
+          <div class="hero-icon-box">📡</div>
+          <h2 data-i18n="readTitle">Leitor & Diagnóstico de Chips NFC</h2>
+          <p data-i18n="readSub">Identifique o modelo do chip, número de série UID, memória livre e inspecione todos os registros NDEF gravados.</p>
+          <button type="button" class="btn-primary large-btn" id="btn-start-read">
+            🔍 <span data-i18n="btnStartRead">Ativar Leitor NFC</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Scanned Tag Details Card (Shown when a tag is read) -->
+      <div class="diagnostics-card" id="scan-result-card" hidden>
+        <div class="card-header">
+          <div class="header-left">
+            <span class="badge-chip" id="res-chip-type">NTAG215</span>
+            <h3 id="res-tag-title">Tag NFC Detectada</h3>
+          </div>
+          <div class="header-actions-inline">
+            <button type="button" class="btn-small outline" id="btn-clone-scanned" data-i18n="btnCloneTag">📋 Clonar</button>
+            <button type="button" class="btn-small outline" id="btn-export-json" data-i18n="btnExportJson">💾 Exportar</button>
+          </div>
+        </div>
+
+        <!-- Hardware Specs Grid -->
+        <div class="specs-grid">
+          <div class="spec-item">
+            <span class="spec-label">UID / Número de Série:</span>
+            <div class="uid-row">
+              <strong id="res-uid">04:A2:3B:4C:5D:6E:7F</strong>
+              <button type="button" class="btn-tiny" id="btn-copy-uid" title="Copiar UID">Copiar</button>
+            </div>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label" data-i18n="lblChipFamily">Família do Chip:</span>
+            <strong id="res-family">NXP NTAG (ISO 14443-A)</strong>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label" data-i18n="lblPayloadSize">Tamanho dos Dados:</span>
+            <strong id="res-bytes">68 bytes</strong>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label" data-i18n="lblWriteStatus">Status de Gravação:</span>
+            <span class="status-pill status-rw" id="res-lock-status">Leitura e Escrita (RW)</span>
+          </div>
+        </div>
+
+        <!-- Decoded Records List -->
+        <div class="records-section">
+          <h4 data-i18n="recordsTitle">Registros NDEF Decodificados (<span id="res-record-count">1</span>)</h4>
+          <div class="records-list" id="res-records-container">
+            <!-- Record Cards will be dynamically injected here -->
+          </div>
+        </div>
+
+        <!-- Hex Inspector Toggle -->
+        <div class="hex-section">
+          <button type="button" class="btn-action full-btn" id="btn-toggle-hex">
+            💻 <span data-i18n="btnToggleHex">Ver Dados em Hexadecimal & ASCII</span>
+          </button>
+          <div class="hex-viewer" id="hex-viewer-box" hidden>
+            <pre id="hex-viewer-content"></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scanned History -->
+      <div class="history-card">
+        <div class="history-head">
+          <h4 data-i18n="historyTitle">Histórico de Tags Lidas</h4>
+          <button type="button" class="btn-text-danger" id="btn-clear-history" data-i18n="btnClearHistory">Limpar</button>
+        </div>
+        <div class="history-list" id="history-container">
+          <p class="empty-state" data-i18n="noHistory">Nenhuma tag lida nesta sessão.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: WRITE NDEF (GRAVAR) -->
+    <section class="tab-pane" id="pane-write" hidden>
+      <div class="composer-card">
+        <div class="composer-header">
+          <div>
+            <h2 data-i18n="writeTitle">Criador de Registros NDEF</h2>
+            <p data-i18n="writeSub">Selecione o tipo de dado que deseja gravar no chip plástico.</p>
+          </div>
+        </div>
+
+        <!-- Record Type Grid (Visual Cards) -->
+        <div class="type-selector-grid">
+          <button type="button" class="type-btn active" data-type="url">
+            <span class="type-icon">🌐</span>
+            <span class="type-label">URL / Link</span>
+          </button>
+          <button type="button" class="type-btn" data-type="vcard">
+            <span class="type-icon">📇</span>
+            <span class="type-label">Contato vCard</span>
+          </button>
+          <button type="button" class="type-btn" data-type="wifi">
+            <span class="type-icon">📶</span>
+            <span class="type-label">Rede Wi-Fi</span>
+          </button>
+          <button type="button" class="type-btn" data-type="text">
+            <span class="type-icon">📝</span>
+            <span class="type-label">Texto Puro</span>
+          </button>
+          <button type="button" class="type-btn" data-type="phone">
+            <span class="type-icon">📞</span>
+            <span class="type-label">Telefone</span>
+          </button>
+          <button type="button" class="type-btn" data-type="sms">
+            <span class="type-icon">💬</span>
+            <span class="type-label">WhatsApp / SMS</span>
+          </button>
+          <button type="button" class="type-btn" data-type="email">
+            <span class="type-icon">✉️</span>
+            <span class="type-label">E-mail</span>
+          </button>
+          <button type="button" class="type-btn" data-type="geo">
+            <span class="type-icon">📍</span>
+            <span class="type-label">GPS / Local</span>
+          </button>
+          <button type="button" class="type-btn" data-type="aar">
+            <span class="type-icon">📱</span>
+            <span class="type-label">App Android</span>
+          </button>
+          <button type="button" class="type-btn" data-type="custom">
+            <span class="type-icon">⚙️</span>
+            <span class="type-label">MIME Custom</span>
+          </button>
+        </div>
+
+        <!-- Dynamic Form Fields -->
+        <form id="form-record-builder" class="builder-form">
+          <!-- 1. URL -->
+          <div class="form-group-pane active" id="pane-type-url">
+            <label class="field">
+              <span data-i18n="lblUrl">Endereço Web (URL):</span>
+              <input type="url" id="inp-url" placeholder="https://4u.ia.br/..." value="https://">
+            </label>
+          </div>
+
+          <!-- 2. vCard -->
+          <div class="form-group-pane" id="pane-type-vcard" hidden>
+            <div class="field-grid-2">
+              <label class="field">
+                <span data-i18n="lblName">Nome Completo:</span>
+                <input type="text" id="vcard-name" placeholder="Ex: Carlos Mendes">
+              </label>
+              <label class="field">
+                <span data-i18n="lblPhone">WhatsApp / Telefone:</span>
+                <input type="tel" id="vcard-phone" placeholder="+55 11 99999-9999">
+              </label>
+            </div>
+            <div class="field-grid-2">
+              <label class="field">
+                <span data-i18n="lblEmail">E-mail:</span>
+                <input type="email" id="vcard-email" placeholder="contato@empresa.com">
+              </label>
+              <label class="field">
+                <span data-i18n="lblCompany">Empresa / Cargo:</span>
+                <input type="text" id="vcard-company" placeholder="Diretor Executivo">
+              </label>
+            </div>
+            <label class="field">
+              <span data-i18n="lblSite">Website:</span>
+              <input type="url" id="vcard-site" placeholder="https://empresa.com">
+            </label>
+          </div>
+
+          <!-- 3. Wi-Fi -->
+          <div class="form-group-pane" id="pane-type-wifi" hidden>
+            <label class="field">
+              <span data-i18n="lblSsid">Nome da Rede Wi-Fi (SSID):</span>
+              <input type="text" id="wifi-ssid" placeholder="Ex: MinhaCasa_5G">
+            </label>
+            <div class="field-grid-2">
+              <label class="field">
+                <span data-i18n="lblWifiPass">Senha do Wi-Fi:</span>
+                <input type="text" id="wifi-pass" placeholder="Senha da rede">
+              </label>
+              <label class="field">
+                <span data-i18n="lblWifiType">Segurança:</span>
+                <select id="wifi-auth" class="select-styled">
+                  <option value="WPA2">WPA / WPA2 / WPA3</option>
+                  <option value="WEP">WEP</option>
+                  <option value="nopass">Aberta (Sem Senha)</option>
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <!-- 4. Text -->
+          <div class="form-group-pane" id="pane-type-text" hidden>
+            <label class="field">
+              <span data-i18n="lblText">Texto ou Mensagem:</span>
+              <textarea id="inp-text" rows="3" placeholder="Digite seu texto, token ou nota…"></textarea>
+            </label>
+          </div>
+
+          <!-- 5. Phone -->
+          <div class="form-group-pane" id="pane-type-phone" hidden>
+            <label class="field">
+              <span data-i18n="lblDirectPhone">Número de Discagem Direta:</span>
+              <input type="tel" id="inp-phone" placeholder="+55 11 99999-9999">
+            </label>
+          </div>
+
+          <!-- 6. SMS / WhatsApp -->
+          <div class="form-group-pane" id="pane-type-sms" hidden>
+            <label class="field">
+              <span data-i18n="lblSmsDest">Número do WhatsApp / Celular:</span>
+              <input type="tel" id="inp-sms-number" placeholder="+55 11 99999-9999">
+            </label>
+            <label class="field">
+              <span data-i18n="lblSmsMsg">Mensagem Pronta:</span>
+              <input type="text" id="inp-sms-body" placeholder="Olá! Vim através do cartão NFC.">
+            </label>
+          </div>
+
+          <!-- 7. Email -->
+          <div class="form-group-pane" id="pane-type-email" hidden>
+            <label class="field">
+              <span data-i18n="lblEmailTo">Destinatário:</span>
+              <input type="email" id="inp-mail-to" placeholder="contato@empresa.com">
+            </label>
+            <label class="field">
+              <span data-i18n="lblEmailSubject">Assunto:</span>
+              <input type="text" id="inp-mail-sub" placeholder="Contato Comercial">
+            </label>
+            <label class="field">
+              <span data-i18n="lblEmailBody">Corpo do E-mail:</span>
+              <textarea id="inp-mail-body" rows="2" placeholder="Mensagem inicial…"></textarea>
+            </label>
+          </div>
+
+          <!-- 8. GPS -->
+          <div class="form-group-pane" id="pane-type-geo" hidden>
+            <div class="field-grid-2">
+              <label class="field">
+                <span>Latitude:</span>
+                <input type="text" id="inp-geo-lat" placeholder="-23.550520">
+              </label>
+              <label class="field">
+                <span>Longitude:</span>
+                <input type="text" id="inp-geo-lng" placeholder="-46.633308">
+              </label>
+            </div>
+          </div>
+
+          <!-- 9. Android App (AAR) -->
+          <div class="form-group-pane" id="pane-type-aar" hidden>
+            <label class="field">
+              <span data-i18n="lblAarPkg">Nome do Pacote Android (Package Name):</span>
+              <input type="text" id="inp-aar-pkg" placeholder="com.whatsapp ou com.google.android.apps.maps">
+            </label>
+            <small class="field-hint" data-i18n="aarHint">Ao encostar o celular na tag, o Android abre este app automaticamente ou direciona para a Google Play Store.</small>
+          </div>
+
+          <!-- 10. Custom MIME -->
+          <div class="form-group-pane" id="pane-type-custom" hidden>
+            <label class="field">
+              <span>MIME Type:</span>
+              <input type="text" id="inp-mime-type" placeholder="application/json">
+            </label>
+            <label class="field">
+              <span data-i18n="lblMimePayload">Conteúdo / Payload:</span>
+              <textarea id="inp-mime-body" rows="3" placeholder='{"device_id": 42, "auth": true}'></textarea>
+            </label>
+          </div>
+
+          <div class="form-actions-row">
+            <button type="button" class="btn-action" id="btn-add-queue" data-i18n="btnAddQueue">
+              ➕ Adicionar Registro à Fila
+            </button>
+          </div>
+        </form>
+
+        <!-- Current Records in Tag Queue -->
+        <div class="tag-queue-card">
+          <div class="queue-head">
+            <h4 data-i18n="queueTitle">Fila de Gravação da Tag (<span id="queue-count">1</span> registro)</h4>
+            <button type="button" class="btn-text-danger" id="btn-clear-queue" data-i18n="btnClear">Limpar Fila</button>
+          </div>
+          <div class="queue-list" id="queue-list-container">
+            <!-- Queue items will be rendered here -->
+          </div>
+        </div>
+
+        <!-- Real-Time Memory Capacity Meter -->
+        <div class="chip-meter-card">
+          <div class="chip-meter-top">
+            <span><span data-i18n="meterTotal">Tamanho Total NDEF:</span> <strong id="meter-bytes">0 bytes</strong></span>
+            <div class="meter-badges" id="meter-chip-badges">
+              <span class="chip-badge badge-ntag213">NTAG213</span>
+              <span class="chip-badge badge-ntag215">NTAG215</span>
+              <span class="chip-badge badge-ntag216">NTAG216</span>
+            </div>
+          </div>
+          <div class="meter-track">
+            <div class="meter-fill" id="meter-bar-fill" style="width: 15%"></div>
+          </div>
+          <small class="meter-hint" id="meter-hint-text">✓ Cabe perfeitamente em chips NTAG213 (144 B), NTAG215 (504 B) e NTAG216 (888 B).</small>
+        </div>
+
+        <!-- Batch / Multi-Write Options -->
+        <div class="write-options-row">
+          <label class="checkbox-label">
+            <input type="checkbox" id="chk-batch-mode">
+            <span data-i18n="chkBatchMode">Gravação Contínua em Lote (Encoste vários cartões em sequência)</span>
+          </label>
+        </div>
+
+        <!-- Radar Write Animation Box -->
+        <div class="hero-radar-preview" id="write-radar" hidden>
+          <div class="radar-rings">
+            <span></span><span></span><span></span>
+            <div class="radar-core">📡</div>
+          </div>
+          <p class="radar-text" id="write-radar-status" data-i18n="radarHoldWrite">Aproxime o cartão plástico NFC atrás do celular para gravar…</p>
+          <div class="batch-counter" id="batch-counter-box" hidden>
+            <span data-i18n="lblTagsWritten">Cartões Gravados:</span> <strong id="batch-count-num">0</strong>
+          </div>
+          <button type="button" class="btn-small danger" id="btn-cancel-write" data-i18n="btnCancel">Parar Gravação</button>
+        </div>
+
+        <!-- Primary Write Trigger -->
+        <div class="write-main-action">
+          <button type="button" class="btn-primary full-btn huge-btn" id="btn-start-write">
+            📡 <span data-i18n="btnWriteNow">Gravar no Chip NFC Agora</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: TOOLS & CLONE (OUTROS) -->
+    <section class="tab-pane" id="pane-tools" hidden>
+      <div class="tools-grid">
+        <!-- 1. Clone Tag -->
+        <div class="tool-card">
+          <div class="tool-icon">📋</div>
+          <div class="tool-content">
+            <h3 data-i18n="toolCloneTitle">Clonar Última Tag Lida</h3>
+            <p data-i18n="toolCloneSub">Replica exatamente os registros NDEF do cartão previamente lido em um novo chip virgem.</p>
+            <button type="button" class="btn-action full-btn" id="btn-tool-clone">
+              📋 <span data-i18n="btnRunClone">Iniciar Clonagem</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. Format / Erase -->
+        <div class="tool-card">
+          <div class="tool-icon">🧹</div>
+          <div class="tool-content">
+            <h3 data-i18n="toolEraseTitle">Formatar / Apagar Chip</h3>
+            <p data-i18n="toolEraseSub">Grava um contêiner NDEF limpo e vazio, removendo todos os links, contatos e payloads anteriores.</p>
+            <button type="button" class="btn-action full-btn" id="btn-tool-erase">
+              🧹 <span data-i18n="btnRunErase">Apagar Conteúdo da Tag</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. Lock Chip (Read-Only) -->
+        <div class="tool-card danger-card">
+          <div class="tool-icon">🔒</div>
+          <div class="tool-content">
+            <h3 data-i18n="toolLockTitle">Bloquear Chip (Somente Leitura)</h3>
+            <p data-i18n="toolLockSub">Trava os bits de gravação do hardware contra alterações futuras. <strong>Operação definitiva e irreversível!</strong></p>
+            <button type="button" class="btn-danger full-btn" id="btn-tool-lock">
+              🔒 <span data-i18n="btnRunLock">Bloquear Tag Permanente</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 4. QR Code Generator -->
+        <div class="tool-card">
+          <div class="tool-icon">🏁</div>
+          <div class="tool-content">
+            <h3 data-i18n="toolQrTitle">Gerar QR Code do Payload</h3>
+            <p data-i18n="toolQrSub">Cria um QR Code escaneável com o mesmo link ou dados que você preparou para a tag física.</p>
+            <button type="button" class="btn-action full-btn" id="btn-tool-qr">
+              🏁 <span data-i18n="btnRunQr">Visualizar QR Code</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Import / Export Profiles Card -->
+      <div class="tool-card full-width-card">
+        <div class="tool-icon">💾</div>
+        <div class="tool-content">
+          <h3 data-i18n="profilesTitle">Backup & Modelos de Gravação</h3>
+          <p data-i18n="profilesSub">Exporte sua fila de dados em arquivo <code>.json</code> ou importe modelos salvos para gravar de novo.</p>
+          <div class="inline-btn-row">
+            <button type="button" class="btn-action" id="btn-export-profile" data-i18n="btnExportProfile">Exportar Modelo (.json)</button>
+            <button type="button" class="btn-action" id="btn-import-profile" data-i18n="btnImportProfile">Importar Modelo (.json)</button>
+            <input type="file" id="inp-profile-file" accept=".json" hidden>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: QUICK TASKS (ATALHOS RÁPIDOS) -->
+    <section class="tab-pane" id="pane-tasks" hidden>
+      <div class="tasks-intro">
+        <h2 data-i18n="tasksTitle">Modelos Prontos & Atalhos Rápidos</h2>
+        <p data-i18n="tasksSub">Clique em um dos atalhos frequentes para carregar a configuração recomendada em 1 toque.</p>
+      </div>
+
+      <div class="tasks-grid">
+        <button type="button" class="task-card" data-quick="wifi">
+          <div class="task-badge" data-i18n="taskWifiBadge">📶 Wi-Fi Balcão</div>
+          <h4 data-i18n="taskWifiTitle">Wi-Fi Sem Senha</h4>
+          <p data-i18n="taskWifiDesc">Seus clientes ou visitas encostam o celular e conectam à internet na hora sem pedir senha.</p>
+        </button>
+
+        <button type="button" class="task-card" data-quick="whatsapp">
+          <div class="task-badge" data-i18n="taskWhatsappBadge">💬 Atendimento</div>
+          <h4 data-i18n="taskWhatsappTitle">Chamar no WhatsApp</h4>
+          <p data-i18n="taskWhatsappDesc">Tag para balcão, mesa ou estande que abre a conversa direta com sua empresa no WhatsApp.</p>
+        </button>
+
+        <button type="button" class="task-card" data-quick="instagram">
+          <div class="task-badge" data-i18n="taskInstaBadge">📷 Social</div>
+          <h4 data-i18n="taskInstaTitle">Abrir Instagram</h4>
+          <p data-i18n="taskInstaDesc">Abre o perfil do Instagram da sua marca direto no app do cliente.</p>
+        </button>
+
+        <button type="button" class="task-card" data-quick="vcard-app">
+          <div class="task-badge" data-i18n="taskVcardBadge">✨ 3D Card</div>
+          <h4 data-i18n="taskVcardTitle">Cartão Executivo 4U</h4>
+          <p data-i18n="taskVcardDesc">Configura o link direto para o seu Cartão Virtual 3D do ecossistema 4u.ia.br.</p>
+        </button>
+
+        <button type="button" class="task-card" data-quick="webhook">
+          <div class="task-badge" data-i18n="taskWebhookBadge">⚡ Automação</div>
+          <h4 data-i18n="taskWebhookTitle">Disparador de Webhook</h4>
+          <p data-i18n="taskWebhookDesc">Tag para automação residencial ou disparo de fluxos no n8n ao aproximar.</p>
+        </button>
+
+        <button type="button" class="task-card" data-quick="maps">
+          <div class="task-badge" data-i18n="taskMapsBadge">📍 Localização</div>
+          <h4 data-i18n="taskMapsTitle">Como Chegar (Maps)</h4>
+          <p data-i18n="taskMapsDesc">Inicia a rota no Google Maps até o endereço da sua clínica, escritório ou loja.</p>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- DIALOG: QUICK TASK WIZARD -->
+  <dialog id="dialog-quick-task" class="modal">
+    <div class="modal-header">
+      <h3 id="quick-modal-title">Configurar Atalho Rápido</h3>
+      <button type="button" class="modal-close" data-close>×</button>
+    </div>
+    <div class="modal-body">
+      <p id="quick-modal-desc" style="color:#94a3b8; margin:0 0 4px; font-size:12.5px; line-height:1.45;"></p>
+      <div id="quick-modal-fields" class="builder-form" style="padding:14px; gap:10px; margin-top:6px;"></div>
+
+      <div class="modal-actions-right" style="padding-top:10px; gap:8px;">
+        <button type="button" class="btn-action" id="btn-quick-to-editor" data-i18n="btnQuickToEditor">✏️ Abrir no Editor</button>
+        <button type="button" class="btn-primary" id="btn-quick-write-now" data-i18n="btnQuickWriteNow">📡 Gravar no Chip Agora</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- DIALOG: HELP & GUIDE -->
+  <dialog id="dialog-help" class="modal">
+    <div class="modal-header">
+      <h3 data-i18n="helpTitle">📘 Guia Rápido — NFC Lab</h3>
+      <button type="button" class="modal-close" data-close>×</button>
+    </div>
+    <div class="modal-body">
+      <p data-i18n="help1"><strong>1. Suporte no Navegador:</strong> A gravação e leitura direta funcionam através do Google Chrome ou Edge em celulares <strong>Android</strong> com o NFC ativado nas configurações do sistema.</p>
+      <p data-i18n="help2"><strong>2. Chips Compatíveis:</strong> Funciona com qualquer cartão, chaveiro ou tag padrão NFC Forum NDEF: NTAG213 (144 bytes), NTAG215 (504 bytes), NTAG216 (888 bytes), Mifare Ultralight, etc.</p>
+      <p data-i18n="help3"><strong>3. No iPhone (iOS):</strong> A Apple permite que o iPhone leia tags normalmente ao aproximar, mas restringe a gravação direta por navegadores. Grave suas tags com um aparelho Android e elas funcionarão perfeitamente em iPhones!</p>
+      <p data-i18n="help4"><strong>4. Dados 100% Clicáveis:</strong> Todos os dados do cartão (telefone, WhatsApp, e-mail e endereço com abertura direta do Google Maps) são interativos e clicáveis ao aproximar.</p>
+      <div class="modal-actions-right">
+        <a href="help.html" class="btn-action" target="_blank">Ver Guia Completo ↗</a>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- DIALOG: 4U-LABS COMMUNITY & 14 OFFICIAL LINKS -->
+  <dialog id="dialog-community" class="modal modal-wide">
+    <div class="modal-header">
+      <h3 data-i18n="hubTitle">🌐 4u-Labs — Aplicativos, Suporte e Comunidade</h3>
+      <button type="button" class="modal-close" data-close>×</button>
+    </div>
+    <div class="modal-body">
+      <p class="modal-sub" data-i18n="hubSub">Conheça o ecossistema 4u-Labs, acesse nossa loja de aplicativos web e acompanhe nossos projetos oficiais:</p>
+
+      <div class="hub-group">
+        <h4 data-i18n="hubGroupInst">Institucional & Ecossistema</h4>
+        <div class="hub-links-grid">
+          <a href="https://4u.ia.br/" target="_blank" rel="noopener noreferrer" class="hub-link-item">
+            <span class="hub-icon">🌐</span>
+            <div><strong>Portal 4U</strong><small>4u.ia.br</small></div>
+          </a>
+          <a href="https://4u.ia.br/loja/index.php" target="_blank" rel="noopener noreferrer" class="hub-link-item">
+            <span class="hub-icon">🛍️</span>
+            <div><strong>Loja de Aplicativos</strong><small>Catálogo Web Apps</small></div>
+          </a>
+          <a href="https://4u.ia.br/suporte.html" target="_blank" rel="noopener noreferrer" class="hub-link-item">
+            <span class="hub-icon">🛟</span>
+            <div><strong>Central de Ajuda</strong><small>Suporte oficial</small></div>
+          </a>
+          <a href="https://4u.ia.br/sobre.html" target="_blank" rel="noopener noreferrer" class="hub-link-item">
+            <span class="hub-icon">ℹ️</span>
+            <div><strong>Sobre a 4U</strong><small>Nossa missão</small></div>
+          </a>
+          <a href="https://4u.ia.br/termos.html" target="_blank" rel="noopener noreferrer" class="hub-link-item">
+            <span class="hub-icon">📜</span>
+            <div><strong>Termos Gerais</strong><small>Diretrizes de uso</small></div>
+          </a>
+          <a href="https://4u.ia.br/politica.html" target="_blank" rel="noopener noreferrer" class="hub-link-item">
+            <span class="hub-icon">🔒</span>
+            <div><strong>Privacidade</strong><small>Segurança de dados</small></div>
+          </a>
+        </div>
+      </div>
+
+      <div class="hub-group">
+        <h4 data-i18n="hubGroupSocial">Comunidade, Código & Redes</h4>
+        <div class="hub-links-grid">
+          <a href="https://github.com/4u-Labs" target="_blank" rel="noopener noreferrer" class="hub-link-item">
+            <span class="hub-icon">💻</span>
+            <div><strong>GitHub Oficial</strong><small>Código aberto</small></div>
+          </a>
+          <a href="https://4u-labs.github.io/" target="_blank" rel="noopener noreferrer" class="hub-link-item">
+            <span class="hub-icon">📝</span>
+            <div><strong>Blog Dev</strong><small>Artigos e novidades</small></div>
+          </a>
+          <a href="https://alternativeto.net/user/4u-ia-br/added/" target="_blank" rel="noopener noreferrer" class="hub-link-item">
+            <span class="hub-icon">⭐</span>
+            <div><strong>AlternativeTo</strong><small>Avaliações da comunidade</small></div>
+          </a>
+          <a href="https://www.youtube.com/@fbr4g4" target="_blank" rel="noopener noreferrer" class="hub-link-item">
+            <span class="hub-icon">📺</span>
+            <div><strong>YouTube</strong><small>Tutoriais e demos</small></div>
+          </a>
+          <a href="https://www.instagram.com/fbr4g4/" target="_blank" rel="noopener noreferrer" class="hub-link-item">
+            <span class="hub-icon">📸</span>
+            <div><strong>Instagram</strong><small>@fbr4g4</small></div>
+          </a>
+          <a href="https://www.facebook.com/fbr4g4/" target="_blank" rel="noopener noreferrer" class="hub-link-item">
+            <span class="hub-icon">👥</span>
+            <div><strong>Facebook</strong><small>Página oficial</small></div>
+          </a>
+          <a href="https://x.com/fbr4g4" target="_blank" rel="noopener noreferrer" class="hub-link-item">
+            <span class="hub-icon">🐦</span>
+            <div><strong>X / Twitter</strong><small>@fbr4g4</small></div>
+          </a>
+          <a href="https://www.linkedin.com/in/fbr4g4/" target="_blank" rel="noopener noreferrer" class="hub-link-item">
+            <span class="hub-icon">💼</span>
+            <div><strong>LinkedIn</strong><small>Rede profissional</small></div>
+          </a>
+        </div>
+      </div>
+
+      <div class="hub-donate-card">
+        <div>
+          <strong data-i18n="donateTitle">♡ Apoie o desenvolvimento gratuito da 4u-Labs</strong>
+          <p data-i18n="donateSub">Nossos aplicativos são 100% livres de anúncios. Sua contribuição mantém os servidores ativos!</p>
+        </div>
+        <a href="https://www.paypal.com/ncp/payment/L7YRCS984T33N" target="_blank" rel="noopener noreferrer" class="btn-primary" data-i18n="btnDonate">
+          ♡ Apoiar com PayPal
+        </a>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- DIALOG: LOCK CONFIRMATION (SAFETY FIRST) -->
+  <dialog id="dialog-lock-confirm" class="modal">
+    <div class="modal-header">
+      <h3 style="color:#ef4444">⚠️ Confirmar Bloqueio Permanente</h3>
+      <button type="button" class="modal-close" data-close>×</button>
+    </div>
+    <div class="modal-body">
+      <p>Você está prestes a queimar os bits físicos de bloqueio (Lock Bytes) do chip.</p>
+      <div class="danger-box">
+        <strong>Esta ação é 100% IRREVERSÍVEL.</strong><br>
+        O cartão nunca mais poderá ser apagado ou regravado por nenhum dispositivo.
+      </div>
+      <p>Deseja continuar com a trava de somente-leitura?</p>
+      <div class="modal-actions-right">
+        <button type="button" class="btn-action" data-close>Cancelar</button>
+        <button type="button" class="btn-danger" id="btn-execute-lock">Sim, Bloquear Permanente</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- DIALOG: QR CODE VIEWER -->
+  <dialog id="dialog-qr" class="modal">
+    <div class="modal-header">
+      <h3 data-i18n="qrModalTitle">🏁 QR Code do Payload</h3>
+      <button type="button" class="modal-close" data-close>×</button>
+    </div>
+    <div class="modal-body" style="text-align:center">
+      <canvas id="qr-canvas" width="220" height="220" style="margin:16px auto; border-radius:12px; background:#fff; padding:12px;"></canvas>
+      <p id="qr-payload-text" style="word-break:break-all; font-size:12px; color:#94a3b8; font-family: monospace;"></p>
+    </div>
+  </dialog>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-box" aria-live="polite"></div>
+
+  <!-- Standard 2-Line Footer -->
+  <footer class="app-footer">
+    <div class="footer-line-1">
+      <img src="icon-192.png?v=1.2" alt="NFC Lab" width="18" height="18" style="border-radius:4px">
+      <span>© <span id="footer-year">2026</span> <strong>NFC Lab</strong> · 4u-Labs</span>
+    </div>
+    <div class="footer-line-2">
+      <button type="button" class="footer-link-btn" id="footer-btn-community">4u-Labs ↗</button>
+      <span>·</span>
+      <a href="help.html" target="_blank" data-i18n="footerGuide">Guia</a>
+      <span>·</span>
+      <a href="privacy.html" target="_blank" data-i18n="footerPrivacy">Privacidade</a>
+      <span>·</span>
+      <a href="terms.html" target="_blank" data-i18n="footerTerms">Termos</a>
+      <span>·</span>
+      <a href="https://www.paypal.com/ncp/payment/L7YRCS984T33N" target="_blank" rel="noopener noreferrer" style="color:#00f5e1" data-i18n="footerDonate">♡ Apoiar</a>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="qrcode.min.js"></script>
+  <script src="app.js?v=1.2"></script>
+</body>
+</html>
