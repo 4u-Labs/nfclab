@@ -26,6 +26,11 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
 body {
   margin: 0;
   min-height: 100dvh;
@@ -44,6 +49,7 @@ body {
 /* ================= HEADER BAR ================= */
 .app-header {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
@@ -1154,7 +1160,12 @@ body {
   color: #ffffff;
 }
 
-.modal-body {
+.modal-html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+body {
   padding: 18px;
   display: flex;
   flex-direction: column;
